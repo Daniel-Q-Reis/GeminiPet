@@ -1,0 +1,75 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Welcome to GeminiPet{% endblock %}
+
+{% block content %}
+{% if banners %}
+<div id="bannerCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        {% for banner in banners %}
+        <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" aria-current="true" aria-label="Slide {{ forloop.counter }}"></button>
+        {% endfor %}
+    </div>
+    <div class="carousel-inner">
+        {% for banner in banners %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <a href="{% url 'store:products_by_category' banner.target_category.slug %}">
+                <img src="{{ banner.image.url }}" class="d-block w-100" alt="{{ banner.title }}">
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+{% endif %}
+
+<div class="container my-5">
+    <div class="row text-center">
+        <div class="col-md-3">
+            <i class="fa-solid fa-truck-fast fa-2x mb-3"></i>
+            <h5>Receba em Horas</h5>
+        </div>
+        <div class="col-md-3">
+            <i class="fa-solid fa-box-open fa-2x mb-3"></i>
+            <h5>Frete Grátis Brasil</h5>
+        </div>
+        <div class="col-md-3">
+            <i class="fa-solid fa-credit-card fa-2x mb-3"></i>
+            <h5>Até 3x Sem Juros</h5>
+        </div>
+        <div class="col-md-3">
+            <i class="fa-solid fa-store fa-2x mb-3"></i>
+            <h5>Retire e Troque na Loja</h5>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 text-center my-4">
+        <h1>Featured Products</h1>
+    </div>
+</div>
+<div class="row">
+    {% for product in featured_products %}
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <img src="{% if product.image %}{{ product.image.url }}{% else %}https://via.placeholder.com/300{% endif %}" class="card-img-top" alt="{{ product.name }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text">{{ product.description|truncatewords:20 }}</p>
+                <p class="card-text"><strong>${{ product.price }}</strong></p>
+                <a href="{% url 'store:product_detail' product.slug %}" class="btn btn-primary">View Details</a>
+                <a href="{% url 'store:add_to_cart' product.id %}" class="btn btn-success">Add to Cart</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
