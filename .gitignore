@@ -220,5 +220,5 @@ venv/
 env/
 .venv/
 
-# Arquivos de Sistema
+# System files
 .DS_Store
