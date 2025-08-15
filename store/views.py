@@ -35,6 +35,8 @@ def view_cart(request):
     cart = request.session.get('cart', {})
     cart_items = []
     total_price = 0
+    cart_product_ids = list(cart.keys())
+
     for product_id, quantity in cart.items():
         product = get_object_or_404(Product, id=product_id)
         item_total = product.price * quantity
@@ -44,7 +46,24 @@ def view_cart(request):
             'total': item_total
         })
         total_price += item_total
-    return render(request, 'store/cart.html', {'cart_items': cart_items, 'total_price': total_price})
+
+    suggested_products = []
+    if cart_product_ids:
+        # Find categories of products in the cart
+        products_in_cart = Product.objects.filter(id__in=cart_product_ids)
+        category_ids = products_in_cart.values_list('category_id', flat=True).distinct()
+
+        # Find other products in the same categories, excluding those already in the cart
+        suggested_products = Product.objects.filter(category_id__in=category_ids) \
+                                            .exclude(id__in=cart_product_ids) \
+                                            .distinct() \
+                                            .order_by('?')[:4]
+
+    return render(request, 'store/cart.html', {
+        'cart_items': cart_items,
+        'total_price': total_price,
+        'suggested_products': suggested_products
+    })
 
 def search_results(request):
     query = request.GET.get('q')
