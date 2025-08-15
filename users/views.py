@@ -1,19 +1,20 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .forms import UserForm, UserProfileForm
+from django.contrib.auth.forms import AuthenticationForm
+from .forms import CustomUserCreationForm, UserProfileForm
 from .models import UserProfile
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            user.backend = 'django.contrib.auth.backends.ModelBackend'  # Set the backend
             login(request, user)
             return redirect('store:index')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'users/register.html', {'form': form})
 
 def login_view(request):
@@ -37,16 +38,10 @@ def logout_view(request):
 def profile(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
     if request.method == 'POST':
-        user_form = UserForm(request.POST, instance=request.user)
-        profile_form = UserProfileForm(request.POST, instance=profile)
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
+        form = UserProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
             return redirect('users:profile')
     else:
-        user_form = UserForm(instance=request.user)
-        profile_form = UserProfileForm(instance=profile)
-    return render(request, 'users/profile.html', {
-        'user_form': user_form,
-        'profile_form': profile_form
-    })
+        form = UserProfileForm(instance=profile)
+    return render(request, 'users/profile.html', {'form': form})

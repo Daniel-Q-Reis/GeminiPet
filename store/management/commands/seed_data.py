@@ -2,15 +2,16 @@ import random
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
 from faker import Faker
-from store.models import Category, Product
+from store.models import Category, Product, Banner
 
 class Command(BaseCommand):
-    help = 'Seeds the database with categories and products.'
+    help = 'Seeds the database with categories, products, and banners.'
 
     def handle(self, *args, **kwargs):
         self.stdout.write('Deleting existing data...')
         Product.objects.all().delete()
         Category.objects.all().delete()
+        Banner.objects.all().delete()
 
         self.stdout.write('Creating categories...')
         fake = Faker('pt_BR')
@@ -35,6 +36,15 @@ class Command(BaseCommand):
                 stock=random.randint(10, 100),
                 is_featured=random.random() < 0.2, # 20% chance
                 image='products/placeholder.png'
+            )
+
+        self.stdout.write('Creating banners...')
+        for i in range(3):
+            Banner.objects.create(
+                title=f'Banner Promocional {i+1}',
+                image=f'banners/banner_{i+1}.png',
+                link_url='/',
+                is_active=True
             )
 
         self.stdout.write(self.style.SUCCESS('Successfully seeded the database.'))
