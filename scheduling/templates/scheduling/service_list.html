@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Our Services</h2>
+    <h2 class="text-center mb-4">{{ service_type.name }} Services</h2>
     <div class="row">
         {% for service in services %}
         <div class="col-md-4 mb-4">
@@ -15,6 +15,10 @@
                     <a href="{% url 'scheduling:select_date' service.id %}" class="btn btn-primary">Book Now</a>
                 </div>
             </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-center">There are no services available for this category at the moment. Please check back later.</p>
         </div>
         {% endfor %}
     </div>
